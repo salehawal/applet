@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Generator</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea, select { width: 100%; padding: 8px; }
+  </style>
+</head>
+<body style="width:90%; margin: auto;">
+
+<div id="form-container"></div>
+
+<script>
+const fieldCodes = {
+  50: 'hidden',
+  51: 'number',
+  200: 'text',
+  210: 'email',
+  220: 'password',
+  1000: 'textarea',
+  60: 'radio',
+  61: 'checkbox',
+  62: 'select',
+  30: 'date',
+  32: 'datetime-local',
+  70: 'hidden'
+};
+
+// Example fields object
+const fields = {
+  username: { code: 200, attributes: { name: "username", placeholder: "Enter username" }},
+  email: { code: 210, attributes: { name: "email", placeholder: "Enter email" }},
+  password: { code: 220, attributes: { name: "password", placeholder: "Enter password" }},
+  bio: { code: 1000, attributes: { name: "bio", placeholder: "Tell us about yourself" }},
+  gender: { code: 60, attributes: { name: "gender", options: ["Male", "Female"] }},
+  terms: { code: 61, attributes: { name: "terms", label: "Accept Terms" }},
+  country: { code: 62, attributes: { name: "country", options: ["USA", "Canada", "Other"] }},
+  birthday: { code: 30, attributes: { name: "birthday" }},
+  session: { code: 32, attributes: { name: "session" }}
+};
+
+function generateForm(fields) {
+  const form = document.createElement('form');
+
+  for (const key in fields) {
+    const field = fields[key];
+    const type = fieldCodes[field.code];
+    const attrs = field.attributes;
+    const group = document.createElement('div');
+    group.className = 'form-group';
+
+    if (type === 'hidden') {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      setAttributes(input, attrs);
+      form.appendChild(input);
+      continue;
+    }
+
+    if (type === 'textarea') {
+      if (attrs.label) {
+        const label = document.createElement('label');
+        label.textContent = attrs.label || attrs.name;
+        group.appendChild(label);
+      }
+      const textarea = document.createElement('textarea');
+      setAttributes(textarea, attrs);
+      group.appendChild(textarea);
+    }
+    else if (type === 'radio' || type === 'checkbox') {
+      const label = document.createElement('label');
+      label.textContent = attrs.label || attrs.name;
+      group.appendChild(label);
+
+      (attrs.options || ["Yes"]).forEach(opt => {
+        const wrapper = document.createElement('div');
+        const input = document.createElement('input');
+        input.type = type;
+        input.name = attrs.name;
+        input.value = opt;
+        const text = document.createTextNode(opt);
+        wrapper.appendChild(input);
+        wrapper.appendChild(text);
+        group.appendChild(wrapper);
+      });
+    }
+    else if (type === 'select') {
+      if (attrs.label) {
+        const label = document.createElement('label');
+        label.textContent = attrs.label || attrs.name;
+        group.appendChild(label);
+      }
+      const select = document.createElement('select');
+      select.name = attrs.name;
+      (attrs.options || []).forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt;
+        option.textContent = opt;
+        select.appendChild(option);
+      });
+      group.appendChild(select);
+    }
+    else {
+      if (attrs.label) {
+        const label = document.createElement('label');
+        label.textContent = attrs.label || attrs.name;
+        group.appendChild(label);
+      }
+      const input = document.createElement('input');
+      input.type = type;
+      setAttributes(input, attrs);
+      group.appendChild(input);
+    }
+
+    form.appendChild(group);
+  }
+
+  const submit = document.createElement('button');
+  submit.type = 'submit';
+  submit.textContent = 'Submit';
+  form.appendChild(submit);
+
+  document.getElementById('form-container').appendChild(form);
+}
+
+function setAttributes(element, attributes) {
+  for (const key in attributes) {
+    if (key !== 'options') { // Skip 'options' key
+      element.setAttribute(key, attributes[key]);
+    }
+  }
+}
+
+// Generate the form
+generateForm(fields);
+</script>
+
+</body>
+</ht
